@@ -1,0 +1,29 @@
+import ast
+import re
+import textwrap
+
+def sqa_checklist(code):
+    checklist = {
+        "Function Documentation": [],
+        "Naming Convention": [],
+        "Indentation": []
+    }
+
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        return f"Syntax Error in code: {e}"
+
+    lines = code.splitlines()
+
+    # Function checks
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            # 1. Docstring Check
+            docstring = ast.get_docstring(node)
+            checklist["Function Documentation"].append(
+                (node.name, "Present" if docstring else "Missing")
+            )
+
+            # 2. Naming Convention Check
+            is_snake = bool(re.fullmatch(r"[a-z_][a-z0-9_]*", node.name))*_]()_]()_
