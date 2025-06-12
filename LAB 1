@@ -1,0 +1,54 @@
+import ast
+
+class CyclomaticComplexityAnalyzer(ast.NodeVisitor):
+    def __init__(self):
+        self.edges = 0
+        self.nodes = 1  # Start with 1 for the start node
+        self.decision_points = 0
+
+    def visit_If(self, node):
+        self.decision_points += 1
+        self.generic_visit(node)
+
+    def visit_For(self, node):
+        self.decision_points += 1
+        self.generic_visit(node)
+
+    def visit_While(self, node):
+        self.decision_points += 1
+        self.generic_visit(node)
+
+    def visit_Try(self, node):
+        # each except or finally is a decision point
+        self.decision_points += len(node.handlers) + (1 if node.finalbody else 0)
+        self.generic_visit(node)
+
+    def visit_BoolOp(self, node):
+        if isinstance(node.op, (ast.And, ast.Or)):
+            self.decision_points += len(node.values) - 1
+        self.generic_visit(node)
+
+    def calculate_complexity(self):
+        return self.decision_points + 1
+
+# Sample function to analyze
+code = """
+def example(x):
+    if x > 0:
+        print("Positive")
+    elif x < 0:
+        print("Negative")
+    else:
+        print("Zero")
+    for i in range(5):
+        if i % 2 == 0:
+            print(i)
+"""
+
+# Parse the code and compute McCabe's Cyclomatic Complexity
+tree = ast.parse(code)
+analyzer = CyclomaticComplexityAnalyzer()
+analyzer.visit(tree)
+
+complexity = analyzer.calculate_complexity()
+print("McCabe's Cyclomatic Complexity:", complexity)
